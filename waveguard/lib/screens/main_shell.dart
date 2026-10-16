@@ -23,12 +23,12 @@ class _MainShellState extends State<MainShell> {
   final Set<int> _visited = {0};
   final _keys = List.generate(5, (_) => GlobalKey<NavigatorState>());
   final _canPop = List.filled(5, false);
-  final _screens = const [
-    AdvisoryScreen(),
-    ForecastScreen(),
-    MapScreen(),
-    BeachesScreen(),
-    MoreScreen(),
+  List<Widget> get _screens => [
+    AdvisoryScreen(onAccount: _account, onSelectTab: _selectTab),
+    const ForecastScreen(),
+    const MapScreen(),
+    const BeachesScreen(),
+    const MoreScreen(),
   ];
   Future<void> _account() async {
     final session = context.read<SessionProvider>();
@@ -99,7 +99,7 @@ class _MainShellState extends State<MainShell> {
         }
       },
       child: Scaffold(
-        appBar: _canPop[_index]
+        appBar: (_canPop[_index] || _index == 0)
             ? null
             : AppBar(
                 title: _index == 0

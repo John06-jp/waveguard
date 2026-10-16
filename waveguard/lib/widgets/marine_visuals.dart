@@ -81,7 +81,13 @@ class CoastalPhoto extends StatelessWidget {
 }
 
 class LocationStrip extends StatelessWidget {
-  const LocationStrip({this.onTap, this.refresh, super.key});
+  const LocationStrip({
+    this.onTap,
+    this.refresh,
+    this.dropdown = false,
+    super.key,
+  });
+  final bool dropdown;
   final VoidCallback? onTap, refresh;
   @override
   Widget build(BuildContext context) => Material(
@@ -123,7 +129,11 @@ class LocationStrip extends StatelessWidget {
                 icon: const Icon(Icons.refresh, color: SeaColors.ocean),
               )
             else if (onTap != null)
-              const Icon(Icons.chevron_right, color: SeaColors.ocean, size: 21),
+              Icon(
+                dropdown ? Icons.keyboard_arrow_down : Icons.chevron_right,
+                color: SeaColors.ocean,
+                size: 21,
+              ),
           ],
         ),
       ),

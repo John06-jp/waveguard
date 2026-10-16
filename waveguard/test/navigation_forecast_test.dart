@@ -88,7 +88,19 @@ void main() {
         );
       }
       await capture(tester, 'home');
-      await tester.tap(find.text('Current Weather'));
+      await tester.tap(find.text('Lianga, Surigao del Sur'));
+      await tester.pumpAndSettle();
+      expect(find.text('Select location'), findsOneWidget);
+      await tester.tap(find.text('Use Lianga'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Notifications'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('No alerts are available'), findsOneWidget);
+      Navigator.of(
+        tester.element(find.textContaining('No alerts are available')),
+      ).pop();
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Current Weather'));
       await tester.pumpAndSettle();
       expect(find.text('Current Marine Conditions'), findsOneWidget);
       expect(find.byType(NavigationBar), findsOneWidget);
