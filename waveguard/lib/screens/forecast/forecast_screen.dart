@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/marine_forecast.dart';
 import '../../providers/marine_provider.dart';
+import '../../providers/public_data_provider.dart';
 import '../../services/app_preferences.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/shared.dart';
@@ -65,19 +66,36 @@ class _ForecastScreenState extends State<ForecastScreen> {
       onRefresh: data.load,
       child: PageBody(
         children: [
-          Text(
-            _daily
-                ? '7-Day Marine Forecast'
-                : 'Hourly Marine Forecast (Next 48 Hours)',
-            style: Theme.of(context).textTheme.titleLarge,
+          const MarineHeader(
+            title: 'Marine Forecast',
+            subtitle: 'Plan ahead with regional marine weather data.',
           ),
-          const SizedBox(height: 8),
-          const LocationStrip(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           SegmentedButton<bool>(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.selected)
+                    ? SeaColors.ocean
+                    : Colors.white,
+              ),
+              foregroundColor: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.selected)
+                    ? Colors.white
+                    : SeaColors.ink,
+              ),
+            ),
+            showSelectedIcon: false,
             segments: const [
-              ButtonSegment(value: false, label: Text('Hourly')),
-              ButtonSegment(value: true, label: Text('7-Day')),
+              ButtonSegment(
+                value: false,
+                icon: Icon(Icons.waves),
+                label: Text('Hourly'),
+              ),
+              ButtonSegment(
+                value: true,
+                icon: Icon(Icons.calendar_month),
+                label: Text('7-Day'),
+              ),
             ],
             selected: {_daily},
             onSelectionChanged: (selection) => setState(() {
@@ -87,6 +105,15 @@ class _ForecastScreenState extends State<ForecastScreen> {
           ),
           const SizedBox(height: 10),
           const MarineNotices(),
+          _CurrentForecastCard(current: data.forecast?.current),
+          const SizedBox(height: 12),
+          Text(
+            _daily
+                ? '7-Day Marine Forecast'
+                : 'Hourly Marine Forecast (Next 48 Hours)',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             children: ['Wave height', 'Direction', 'Period']
@@ -164,7 +191,9 @@ class _ForecastScreenState extends State<ForecastScreen> {
                   ? 'Daily maximum height and period; dominant direction.'
                   : 'Tap the chart or move the slider to inspect an hour.',
             ),
-            const SectionTitle('Forecast data'),
+            SectionTitle(
+              _daily ? 'Daily Marine Forecast' : 'Hourly Marine Forecast',
+            ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
@@ -551,6 +580,21 @@ class _ForecastPainter extends CustomPainter {
       }
     }
     if (!bars) {
+      if (values.isNotEmpty && values.every((v) => v != null)) {
+        final area = Path.from(path)
+          ..lineTo(size.width, size.height - 8)
+          ..lineTo(0, size.height - 8)
+          ..close();
+        canvas.drawPath(
+          area,
+          Paint()
+            ..shader = const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x660087FF), Color(0x080087FF)],
+            ).createShader(Offset.zero & size),
+        );
+      }
       canvas.drawPath(
         path,
         Paint()
@@ -563,4 +607,130 @@ class _ForecastPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _ForecastPainter oldDelegate) => true;
+}
+
+class _CurrentForecastCard extends StatelessWidget {
+  const _CurrentForecastCard({required this.current});
+  final MarinePoint? current;
+  @override
+  Widget build(BuildContext context) {
+    final units = context.watch<AppPreferences>();
+    final advisory = context.watch<PublicDataProvider>().snapshot?.advisory;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            "Today's Marine Conditions",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          if (current != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 12),
+              child: Text(
+                stamp(current!.time),
+                style: const TextStyle(fontSize: 11),
+              ),
+            ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns =
+                  constraints.maxWidth >= 330 &&
+                      MediaQuery.textScalerOf(context).scale(1) <= 1.3
+                  ? 4
+                  : 2;
+              final cards = [
+                MarineMetricCard(
+                  Icons.waves,
+                  units.height(current?.height),
+                  'Wave Height',
+                  const Color(0xFF0087FF),
+                ),
+                MarineMetricCard(
+                  Icons.explore_outlined,
+                  current?.direction == null
+                      ? 'Unavailable'
+                      : '${current!.direction!.round()}\u00b0',
+                  'Wave Direction',
+                  const Color(0xFF09A39E),
+                ),
+                MarineMetricCard(
+                  Icons.schedule,
+                  current?.period == null
+                      ? 'Unavailable'
+                      : '${current!.period!.toStringAsFixed(1)} s',
+                  'Wave Period',
+                  const Color(0xFFDA9100),
+                ),
+                MarineMetricCard(
+                  Icons.air,
+                  units.height(current?.windWaveHeight),
+                  'Wind Wave Height',
+                  const Color(0xFF8846D7),
+                ),
+              ];
+              return Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: cards
+                    .map(
+                      (card) => SizedBox(
+                        width:
+                            (constraints.maxWidth - (columns - 1) * 8) /
+                            columns,
+                        child: card,
+                      ),
+                    )
+                    .toList(),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: advisory?.level.background ?? SeaColors.mist,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  advisory?.level.icon ?? Icons.info_outline,
+                  color: advisory?.level.color ?? SeaColors.ocean,
+                  size: 30,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        advisory == null
+                            ? 'Regional advisory unavailable'
+                            : '${advisory.level.label} \u00b7 Regional advisory',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: SeaColors.ink,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Marine conditions are regional. This is not a swimming advisory.',
+                        style: TextStyle(fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

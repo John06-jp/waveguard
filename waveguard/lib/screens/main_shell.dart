@@ -99,7 +99,12 @@ class _MainShellState extends State<MainShell> {
         }
       },
       child: Scaffold(
-        appBar: (_canPop[_index] || _index == 0)
+        appBar:
+            (_canPop[_index] ||
+                _index == 0 ||
+                _index == 1 ||
+                _index == 2 ||
+                _index == 4)
             ? null
             : AppBar(
                 title: _index == 0

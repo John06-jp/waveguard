@@ -196,3 +196,111 @@ class SeaIcon extends StatelessWidget {
     child: Icon(icon, color: Colors.white, size: 25),
   );
 }
+
+/// Shared coastal masthead for the main Forecast and Map destinations.
+class MarineHeader extends StatelessWidget {
+  const MarineHeader({required this.title, required this.subtitle, super.key});
+  final String title, subtitle;
+  @override
+  Widget build(BuildContext context) => Container(
+    clipBehavior: Clip.antiAlias,
+    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+    child: Stack(
+      children: [
+        const Positioned.fill(child: CoastalPhoto()),
+        const Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xEE003561), Color(0x55003F6C)],
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  SeaMark(size: 34),
+                  SizedBox(width: 10),
+                  Text(
+                    'WaveGuard',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 27,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              const LocationStrip(),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class MarineMetricCard extends StatelessWidget {
+  const MarineMetricCard(
+    this.icon,
+    this.value,
+    this.label,
+    this.color, {
+    super.key,
+  });
+  final IconData icon;
+  final String value, label;
+  final Color color;
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: .08),
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: color.withValues(alpha: .15)),
+    ),
+    child: Column(
+      children: [
+        Icon(icon, color: color, size: 30),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: SeaColors.ink,
+            fontSize: 19,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: SeaColors.ink, fontSize: 11),
+        ),
+      ],
+    ),
+  );
+}

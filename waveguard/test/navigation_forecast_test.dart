@@ -134,18 +134,35 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Forecast'));
       await tester.pumpAndSettle();
+      await capture(tester, 'forecast-overview');
+      await tester.scrollUntilVisible(find.byType(Slider), 250);
       expect(
         find.text('Hourly Marine Forecast (Next 48 Hours)'),
         findsOneWidget,
       );
       expect(find.byType(Slider), findsOneWidget);
+      await Scrollable.ensureVisible(
+        tester.element(find.byType(Slider)),
+        alignment: .5,
+      );
+      await tester.pumpAndSettle();
       final previous = tester.widget<Slider>(find.byType(Slider)).value;
       await tester.drag(find.byType(Slider), const Offset(80, 0));
       await tester.pumpAndSettle();
       expect(tester.widget<Slider>(find.byType(Slider)).value, isNot(previous));
       await capture(tester, 'hourly');
+      await tester.scrollUntilVisible(
+        find.text('7-Day'),
+        -250,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('7-Day'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('7-Day Marine Forecast'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('7-Day Marine Forecast'), findsOneWidget);
       await capture(tester, 'daily');
       await tester.tap(
@@ -163,39 +180,61 @@ void main() {
       await tester.tap(find.text('More'));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Settings'));
-      await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
       expect(find.byType(NavigationBar), findsOneWidget);
+      await capture(tester, 'settings-overview');
+      await tester.scrollUntilVisible(
+        find.text('Units'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('Units'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Imperial'));
+      await tester.tap(find.widgetWithText(RadioListTile<bool>, 'Imperial'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Done'));
       await tester.pumpAndSettle();
       await capture(tester, 'settings');
-      await tester.pageBack();
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Safety Tips'));
+      await tester.scrollUntilVisible(
+        find.text('Safety Tips'),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.pump();
       await tester.tap(find.text('Safety Tips'));
       await tester.pumpAndSettle();
       await capture(tester, 'safety-tips');
       await tester.pageBack();
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('About WaveGuard'));
+      await tester.scrollUntilVisible(
+        find.text('About WaveGuard'),
+        -150,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.pump();
       await tester.tap(find.text('About WaveGuard'));
       await tester.pumpAndSettle();
       await capture(tester, 'about');
       await tester.pageBack();
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('SOS'));
+      await tester.scrollUntilVisible(
+        find.text('SOS & Emergency Contacts'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('SOS & Emergency Contacts'));
       await tester.pumpAndSettle();
       await capture(tester, 'emergency-contacts');
       await tester.pageBack();
       await tester.pumpAndSettle();
       await tester.tap(find.text('Forecast'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('7-Day Marine Forecast'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('7-Day Marine Forecast'), findsOneWidget);
       expect(find.textContaining('ft'), findsWidgets);
       expect(tester.takeException(), isNull);

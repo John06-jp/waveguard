@@ -83,7 +83,12 @@ void main() {
     expect(find.text('The coast over time'), findsOneWidget);
     await tester.pageBack();
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('SOS'));
+    await tester.scrollUntilVisible(
+      find.text('SOS & Emergency Contacts'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('SOS & Emergency Contacts'));
     await tester.pumpAndSettle();
     expect(find.text('Emergency assistance'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());

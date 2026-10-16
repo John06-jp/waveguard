@@ -8,6 +8,7 @@ import '../../services/app_config.dart';
 import '../../services/external_actions.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/shared.dart';
+import '../../widgets/marine_visuals.dart';
 import '../../providers/marine_provider.dart';
 import '../../services/app_preferences.dart';
 import '../beach_detail/beach_detail_screen.dart';
@@ -22,6 +23,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   bool _tileError = false, _mapReady = false;
   int _attempt = 0;
+  Beach? _selectedBeach;
   final _mapController = MapController();
   @override
   void dispose() {
@@ -86,6 +88,13 @@ class _MapScreenState extends State<MapScreen> {
     final marine = context.watch<MarineProvider>();
     return PageBody(
       children: [
+        if (!widget.incidentsOnly) ...[
+          const MarineHeader(
+            title: 'Coastal Map',
+            subtitle: 'Explore beaches and regional marine conditions.',
+          ),
+          const SizedBox(height: 12),
+        ],
         const DataNotices(),
         if (widget.incidentsOnly) ...[
           const Notice(
@@ -116,7 +125,7 @@ class _MapScreenState extends State<MapScreen> {
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(
-            height: (MediaQuery.sizeOf(context).height * .57).clamp(330, 520),
+            height: (MediaQuery.sizeOf(context).height * .70).clamp(430, 680),
             child: Stack(
               children: [
                 FlutterMap(
@@ -197,14 +206,57 @@ class _MapScreenState extends State<MapScreen> {
                             .map(
                               (beach) => Marker(
                                 point: LatLng(beach.latitude, beach.longitude),
-                                width: 52,
-                                height: 52,
-                                child: IconButton.filled(
-                                  tooltip: beach.name,
-                                  onPressed: () => openBeach(context, beach.id),
-                                  icon: const Icon(
-                                    Icons.beach_access,
-                                    size: 25,
+                                width: 145,
+                                height: 70,
+                                child: Semantics(
+                                  selected: _selectedBeach?.id == beach.id,
+                                  child: InkWell(
+                                    onTap: () =>
+                                        setState(() => _selectedBeach = beach),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                _selectedBeach?.id == beach.id
+                                                ? SeaColors.ink
+                                                : SeaColors.ocean,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white,
+                                              width: 2,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.beach_access,
+                                            color: Colors.white,
+                                            size: 23,
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 5,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              5,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            beach.name,
+                                            style: const TextStyle(
+                                              color: SeaColors.ink,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -288,7 +340,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 Positioned(
                   right: 12,
-                  bottom: 12,
+                  top: 140,
                   child: Material(
                     color: Colors.white,
                     elevation: 3,
@@ -333,6 +385,16 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
                 ),
+                if (!widget.incidentsOnly &&
+                    (_selectedBeach != null || beaches.isNotEmpty))
+                  Positioned(
+                    left: 8,
+                    right: 8,
+                    bottom: 8,
+                    child: _BeachMapPreview(
+                      beach: _selectedBeach ?? beaches.first,
+                    ),
+                  ),
                 if (!_mapReady)
                   const Center(
                     child: CircularProgressIndicator(
@@ -416,6 +478,98 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _BeachMapPreview extends StatelessWidget {
+  const _BeachMapPreview({required this.beach});
+  final Beach beach;
+  @override
+  Widget build(BuildContext context) {
+    final marine = context.watch<MarineProvider>();
+    final current = marine.forecast?.current;
+    final units = context.watch<AppPreferences>();
+    return Material(
+      color: Colors.white,
+      elevation: 5,
+      borderRadius: BorderRadius.circular(20),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: SeaColors.mist,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.beach_access, color: SeaColors.ocean),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    beach.name,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'View beach details',
+                  onPressed: () => openBeach(context, beach.id),
+                  icon: const Icon(Icons.chevron_right, color: SeaColors.ocean),
+                ),
+              ],
+            ),
+            if (beach.hasCantil)
+              const Text(
+                'Cantil warning \u00b7 sudden drop-off',
+                style: TextStyle(
+                  color: SeaColors.danger,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            const SizedBox(height: 4),
+            Text(
+              marine.repository.isDemo
+                  ? 'Sample regional marine conditions'
+                  : 'Regional marine conditions',
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 14,
+              runSpacing: 6,
+              children: [
+                Text('Waves ${units.height(current?.height)}'),
+                Text(
+                  current?.direction == null
+                      ? 'Direction unavailable'
+                      : 'Direction ${current!.direction!.round()}\u00b0',
+                ),
+                Text(
+                  current?.period == null
+                      ? 'Period unavailable'
+                      : 'Period ${current!.period!.toStringAsFixed(1)} s',
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Regional values; not a beach-specific safety assessment.',
+              style: TextStyle(fontSize: 10),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
