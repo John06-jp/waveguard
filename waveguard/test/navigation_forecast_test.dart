@@ -79,12 +79,28 @@ void main() {
       await tester.tap(find.text('Continue as guest'));
       await tester.pumpAndSettle();
       for (final label in ['Home', 'Forecast', 'Map', 'Beaches', 'More']) {
-        expect(find.text(label), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(NavigationBar),
+            matching: find.text(label),
+          ),
+          findsOneWidget,
+        );
       }
       await capture(tester, 'home');
+      await tester.tap(find.text('Current Weather'));
+      await tester.pumpAndSettle();
+      expect(find.text('Current Marine Conditions'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsOneWidget);
+      await capture(tester, 'current-weather');
+      await tester.pageBack();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Forecast'));
       await tester.pumpAndSettle();
-      expect(find.text('The next 48 hours'), findsOneWidget);
+      expect(
+        find.text('Hourly Marine Forecast (Next 48 Hours)'),
+        findsOneWidget,
+      );
       expect(find.byType(Slider), findsOneWidget);
       final previous = tester.widget<Slider>(find.byType(Slider)).value;
       await tester.drag(find.byType(Slider), const Offset(80, 0));
@@ -93,10 +109,16 @@ void main() {
       await capture(tester, 'hourly');
       await tester.tap(find.text('7-Day'));
       await tester.pumpAndSettle();
-      expect(find.text('Seven days at sea'), findsOneWidget);
+      expect(find.text('7-Day Marine Forecast'), findsOneWidget);
       await capture(tester, 'daily');
-      await tester.tap(find.text('Beaches'));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(NavigationBar),
+          matching: find.text('Beaches'),
+        ),
+      );
       await tester.pumpAndSettle();
+      await capture(tester, 'beaches');
       await tester.tap(find.text('Sample beach'));
       await tester.pumpAndSettle();
       expect(find.text('Beach information'), findsOneWidget);
@@ -107,12 +129,37 @@ void main() {
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
       expect(find.byType(NavigationBar), findsOneWidget);
+      await tester.tap(find.text('Units'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Imperial'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Done'));
+      await tester.pumpAndSettle();
       await capture(tester, 'settings');
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Safety Tips'));
+      await tester.pump();
+      await tester.tap(find.text('Safety Tips'));
+      await tester.pumpAndSettle();
+      await capture(tester, 'safety-tips');
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('About WaveGuard'));
+      await tester.pump();
+      await tester.tap(find.text('About WaveGuard'));
+      await tester.pumpAndSettle();
+      await capture(tester, 'about');
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('SOS'));
+      await tester.pumpAndSettle();
+      await capture(tester, 'emergency-contacts');
+      await tester.pageBack();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Forecast'));
       await tester.pumpAndSettle();
-      expect(find.text('Seven days at sea'), findsOneWidget);
+      expect(find.text('7-Day Marine Forecast'), findsOneWidget);
       expect(find.textContaining('ft'), findsWidgets);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());

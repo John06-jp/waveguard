@@ -1,18 +1,30 @@
 class MarinePoint {
-  const MarinePoint(this.time, this.height, this.direction, this.period);
+  const MarinePoint(
+    this.time,
+    this.height,
+    this.direction,
+    this.period, {
+    this.windWaveHeight,
+    this.seaTemperature,
+  });
   final DateTime time;
   final double? height, direction, period;
+  final double? windWaveHeight, seaTemperature;
   factory MarinePoint.fromJson(Map<String, dynamic> j) => MarinePoint(
     DateTime.parse(j['time'] as String),
     (j['height'] as num?)?.toDouble(),
     (j['direction'] as num?)?.toDouble(),
     (j['period'] as num?)?.toDouble(),
+    windWaveHeight: (j['windWaveHeight'] as num?)?.toDouble(),
+    seaTemperature: (j['seaTemperature'] as num?)?.toDouble(),
   );
   Map<String, dynamic> toJson() => {
     'time': time.toIso8601String(),
     'height': height,
     'direction': direction,
     'period': period,
+    'windWaveHeight': windWaveHeight,
+    'seaTemperature': seaTemperature,
   };
 }
 

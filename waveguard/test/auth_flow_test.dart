@@ -102,7 +102,7 @@ void main() {
       const UserProfile('trusted-user', 'officer@example.com', UserRole.mdrrmo),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Sample regional advisory'), findsOneWidget);
+    expect(find.text('Stay Informed,\nStay Safe'), findsOneWidget);
     await tester.tap(find.byTooltip('Account'));
     await tester.pumpAndSettle();
     expect(find.text('Account role: mdrrmo'), findsOneWidget);

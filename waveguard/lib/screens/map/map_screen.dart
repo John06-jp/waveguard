@@ -22,6 +22,13 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   bool _tileError = false, _mapReady = false;
   int _attempt = 0;
+  final _mapController = MapController();
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
   String? _incidentType;
   @override
   void initState() {
@@ -79,15 +86,6 @@ class _MapScreenState extends State<MapScreen> {
     final marine = context.watch<MarineProvider>();
     return PageBody(
       children: [
-        Text(
-          widget.incidentsOnly
-              ? 'Historical Incident Map'
-              : 'Marine weather map',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        const SizedBox(height: 10),
-        const Text('Lianga, Surigao del Sur · No location tracking'),
-        const SizedBox(height: 16),
         const DataNotices(),
         if (widget.incidentsOnly) ...[
           const Notice(
@@ -118,11 +116,12 @@ class _MapScreenState extends State<MapScreen> {
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(
-            height: 330,
+            height: (MediaQuery.sizeOf(context).height * .57).clamp(330, 520),
             child: Stack(
               children: [
                 FlutterMap(
                   key: ValueKey(_attempt),
+                  mapController: _mapController,
                   options: MapOptions(
                     initialCenter: const LatLng(8.625, 126.093),
                     initialZoom: 12,
@@ -235,6 +234,104 @@ class _MapScreenState extends State<MapScreen> {
                       ],
                     ),
                   ],
+                ),
+                if (!widget.incidentsOnly)
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: Container(
+                      width: 136,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x20002D4C), blurRadius: 12),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Lianga',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: SeaColors.ink,
+                            ),
+                          ),
+                          Text(
+                            context.watch<AppPreferences>().height(
+                              marine.forecast?.current?.height,
+                            ),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: SeaColors.ink,
+                            ),
+                          ),
+                          Text(
+                            marine.forecast?.current?.period == null
+                                ? 'Period unavailable'
+                                : '${marine.forecast!.current!.period!.toStringAsFixed(1)} s',
+                          ),
+                          if (marine.repository.isDemo)
+                            const Text(
+                              'Sample forecast',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: SeaColors.muted,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                Positioned(
+                  right: 12,
+                  bottom: 12,
+                  child: Material(
+                    color: Colors.white,
+                    elevation: 3,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          tooltip: 'Zoom in',
+                          onPressed: !_mapReady
+                              ? null
+                              : () => _mapController.move(
+                                  _mapController.camera.center,
+                                  (_mapController.camera.zoom + 1).clamp(8, 18),
+                                ),
+                          icon: const Icon(Icons.add, color: SeaColors.ink),
+                        ),
+                        IconButton(
+                          tooltip: 'Zoom out',
+                          onPressed: !_mapReady
+                              ? null
+                              : () => _mapController.move(
+                                  _mapController.camera.center,
+                                  (_mapController.camera.zoom - 1).clamp(8, 18),
+                                ),
+                          icon: const Icon(Icons.remove, color: SeaColors.ink),
+                        ),
+                        IconButton(
+                          tooltip: 'Center on Lianga',
+                          onPressed: !_mapReady
+                              ? null
+                              : () => _mapController.move(
+                                  const LatLng(8.6336, 126.0947),
+                                  12,
+                                ),
+                          icon: const Icon(
+                            Icons.center_focus_strong,
+                            color: SeaColors.ink,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 if (!_mapReady)
                   const Center(

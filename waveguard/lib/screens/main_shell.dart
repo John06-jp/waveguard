@@ -99,31 +99,43 @@ class _MainShellState extends State<MainShell> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Brand(),
-          actions: [
-            IconButton(
-              tooltip: 'Refresh public information',
-              onPressed: data.loading ? null : data.load,
-              icon: const Icon(Icons.refresh),
-            ),
-            IconButton(
-              tooltip: 'SOS',
-              onPressed: () => _keys[_index].currentState?.push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const SosScreen(standalone: true),
-                ),
+        appBar: _canPop[_index]
+            ? null
+            : AppBar(
+                title: _index == 0
+                    ? const Brand()
+                    : Text(
+                        const [
+                          'Home',
+                          'Marine Forecast',
+                          'Marine Weather Map',
+                          'Beaches in Lianga',
+                          'More',
+                        ][_index],
+                      ),
+                actions: [
+                  IconButton(
+                    tooltip: 'Refresh public information',
+                    onPressed: data.loading ? null : data.load,
+                    icon: const Icon(Icons.refresh),
+                  ),
+                  IconButton(
+                    tooltip: 'SOS',
+                    onPressed: () => _keys[_index].currentState?.push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const SosScreen(standalone: true),
+                      ),
+                    ),
+                    icon: const Icon(Icons.sos, color: SeaColors.danger),
+                  ),
+                  IconButton(
+                    tooltip: 'Account',
+                    onPressed: _account,
+                    icon: const Icon(Icons.account_circle_outlined),
+                  ),
+                  const SizedBox(width: 8),
+                ],
               ),
-              icon: const Icon(Icons.sos, color: SeaColors.danger),
-            ),
-            IconButton(
-              tooltip: 'Account',
-              onPressed: _account,
-              icon: const Icon(Icons.account_circle_outlined),
-            ),
-            const SizedBox(width: 8),
-          ],
-        ),
         body: SafeArea(
           top: false,
           child: IndexedStack(
@@ -157,8 +169,9 @@ class _MainShellState extends State<MainShell> {
           ),
         ),
         bottomNavigationBar: NavigationBar(
-          backgroundColor: const Color(0xFF084D78),
-          indicatorColor: const Color(0xFF187EB0),
+          backgroundColor: const Color(0xFF003653),
+          indicatorColor: const Color(0xFF0067BC),
+          height: 68,
           selectedIndex: _index,
           onDestinationSelected: _selectTab,
           destinations: const [

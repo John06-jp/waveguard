@@ -4,6 +4,7 @@ import '../../services/app_preferences.dart';
 import '../../services/external_actions.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/shared.dart';
+import '../../widgets/marine_visuals.dart';
 import '../history/history_screen.dart';
 import '../map/map_screen.dart';
 import '../sos/sos_screen.dart';
@@ -33,14 +34,20 @@ class MoreScreen extends StatelessWidget {
         Icons.history_edu,
         'Historical Incident Map',
         'Explore recorded incidents',
-        const Scaffold(body: SafeArea(child: MapScreen(incidentsOnly: true))),
+        Scaffold(
+          appBar: AppBar(title: const Text('Historical Incident Map')),
+          body: const SafeArea(child: MapScreen(incidentsOnly: true)),
+        ),
       ),
       _link(
         context,
         Icons.history,
         'Advisory history',
         'Past regional statuses',
-        const Scaffold(body: SafeArea(child: HistoryScreen())),
+        Scaffold(
+          appBar: AppBar(title: const Text('Advisory history')),
+          body: const SafeArea(child: HistoryScreen()),
+        ),
       ),
       _link(
         context,
@@ -75,8 +82,8 @@ class MoreScreen extends StatelessWidget {
     elevation: 0,
     margin: const EdgeInsets.only(bottom: 10),
     child: ListTile(
-      contentPadding: const EdgeInsets.all(16),
-      leading: Icon(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      leading: SeaIcon(
         icon,
         color: icon == Icons.sos ? SeaColors.danger : SeaColors.ocean,
       ),
@@ -92,7 +99,7 @@ class SafetyTipsScreen extends StatelessWidget {
   const SafetyTipsScreen({super.key});
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Safety Tips')),
+    appBar: AppBar(title: const Text('Water Safety Tips')),
     body: PageBody(
       children: [
         Text(
@@ -128,11 +135,11 @@ class SafetyTipsScreen extends StatelessWidget {
           (tip) => Card(
             elevation: 0,
             child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              leading: const Icon(
-                Icons.health_and_safety_outlined,
-                color: SeaColors.ocean,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 9,
               ),
+              leading: const SeaIcon(Icons.health_and_safety_outlined),
               title: Text(tip.$1),
               subtitle: Text(tip.$2),
             ),
@@ -162,54 +169,130 @@ class SafetyTipsScreen extends StatelessWidget {
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    final preferences = context.watch<AppPreferences>();
-    return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: PageBody(
-        children: [
-          const SectionTitle('Regional location'),
-          const ListTile(
-            leading: Icon(Icons.location_on_outlined),
-            title: Text('Lianga, Surigao del Sur'),
-            subtitle: Text('Fixed regional forecast area. GPS is not used.'),
-          ),
-          const SectionTitle('Units'),
-          RadioGroup<bool>(
+  void _units(BuildContext context) => showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    builder: (_) => Consumer<AppPreferences>(
+      builder: (context, preferences, _) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: RadioGroup<bool>(
             groupValue: preferences.imperial,
             onChanged: (value) {
               if (value != null) preferences.setImperial(value);
             },
-            child: const Column(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                RadioListTile<bool>(
+                Text(
+                  'Display units',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const RadioListTile<bool>(
                   value: false,
                   title: Text('Metric'),
                   subtitle: Text('Metres and kilometres per hour'),
                 ),
-                RadioListTile<bool>(
+                const RadioListTile<bool>(
                   value: true,
                   title: Text('Imperial'),
                   subtitle: Text('Feet and miles per hour'),
                 ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Done'),
+                ),
               ],
             ),
           ),
-          const SectionTitle('Notifications'),
-          SwitchListTile(
-            value: preferences.alerts,
-            onChanged: preferences.setAlerts,
-            title: const Text('Marine alert preference'),
-            subtitle: const Text(
-              'Save your preference on this device. Notification delivery is not connected yet.',
+        ),
+      ),
+    ),
+  );
+  @override
+  Widget build(BuildContext context) {
+    final prefs = context.watch<AppPreferences>();
+    Widget row(
+      IconData icon,
+      String title,
+      String subtitle, {
+      VoidCallback? onTap,
+    }) => Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        leading: SeaIcon(icon),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+        ),
+        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
+        trailing: onTap == null
+            ? null
+            : const Icon(Icons.chevron_right, color: SeaColors.ocean),
+        onTap: onTap,
+      ),
+    );
+    return Scaffold(
+      appBar: AppBar(title: const Text('Settings')),
+      body: PageBody(
+        children: [
+          row(
+            Icons.location_on,
+            'Select Default Location',
+            'Lianga, Surigao del Sur',
+            onTap: () => showDialog<void>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Regional location'),
+                content: const Text(
+                  'Lianga is the fixed study area. Device-location tracking is not used.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Close'),
+                  ),
+                ],
+              ),
             ),
           ),
-          if (preferences.saveError != null)
-            Notice(preferences.saveError!, warning: true),
-          const SectionTitle('Location preferences'),
+          row(
+            Icons.straighten,
+            'Units',
+            prefs.imperial ? 'Imperial (ft, mph)' : 'Metric (m, km/h)',
+            onTap: () => _units(context),
+          ),
+          Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: SwitchListTile(
+              secondary: const SeaIcon(
+                Icons.notifications,
+                color: Color(0xFFFF494E),
+              ),
+              value: prefs.alerts,
+              onChanged: prefs.setAlerts,
+              title: const Text(
+                'Notifications',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+              ),
+              subtitle: const Text(
+                'Marine alert preference. Delivery not connected.',
+                style: TextStyle(fontSize: 12),
+              ),
+            ),
+          ),
+          row(
+            Icons.update,
+            'Data Update Interval',
+            'On screen open and manual refresh',
+          ),
+          row(Icons.palette_outlined, 'App Theme', 'Coastal light'),
+          row(Icons.language, 'Language', 'English'),
+          if (prefs.saveError != null) Notice(prefs.saveError!, warning: true),
+          const SizedBox(height: 12),
           const Notice(
-            'All screens use the Lianga regional location. Beach-specific forecasts and device-location tracking are outside this study scope.',
+            'Units and alert preferences are saved on this device. Forecasts remain regional; no GPS permission is required.',
           ),
         ],
       ),
@@ -224,7 +307,13 @@ class AboutScreen extends StatelessWidget {
     appBar: AppBar(title: const Text('About WaveGuard')),
     body: PageBody(
       children: [
-        const Center(child: Brand()),
+        const Center(child: SeaMark(size: 80)),
+        const SizedBox(height: 8),
+        Text(
+          'WaveGuard',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
         const SizedBox(height: 20),
         const Text(
           'Marine Weather Information System',
@@ -236,6 +325,50 @@ class AboutScreen extends StatelessWidget {
           'WaveGuard presents regional marine conditions, coastal information, and stored advisories for research and informational use. Follow local authorities for official safety instructions.',
         ),
         const SectionTitle('Marine data'),
+        Table(
+          border: const TableBorder(
+            horizontalInside: BorderSide(color: SeaColors.mist),
+          ),
+          columnWidths: const {0: FlexColumnWidth(1), 1: FlexColumnWidth(1.6)},
+          children: const [
+            TableRow(
+              children: [
+                Padding(padding: EdgeInsets.all(8), child: Text('Provider')),
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text('Open-Meteo Marine API'),
+                ),
+              ],
+            ),
+            TableRow(
+              children: [
+                Padding(padding: EdgeInsets.all(8), child: Text('Model')),
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text('Best Match selection'),
+                ),
+              ],
+            ),
+            TableRow(
+              children: [
+                Padding(padding: EdgeInsets.all(8), child: Text('Resolution')),
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text('Depends on upstream model'),
+                ),
+              ],
+            ),
+            TableRow(
+              children: [
+                Padding(padding: EdgeInsets.all(8), child: Text('Refresh')),
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text('Screen open / manual'),
+                ),
+              ],
+            ),
+          ],
+        ),
         const Text(
           'Live forecast mode uses the Open-Meteo Marine Weather API with Best Match model selection. Current values are model estimates. Coverage and update timing depend on the upstream model; retrieved time is shown separately from the valid time.',
         ),

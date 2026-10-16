@@ -4,6 +4,7 @@ import '../models/public_data.dart';
 import '../providers/public_data_provider.dart';
 import '../services/external_actions.dart';
 import '../theme/app_theme.dart';
+import 'marine_visuals.dart';
 
 String stamp(DateTime date) {
   // Lianga uses Philippine Standard Time, independent of device timezone.
@@ -54,14 +55,7 @@ class Brand extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: SeaColors.ocean,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Icon(Icons.waves_rounded, color: Colors.white, size: 27),
-      ),
+      const SeaMark(size: 34),
       const SizedBox(width: 12),
       const Flexible(
         child: Text(
@@ -69,7 +63,7 @@ class Brand extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.w800,
             letterSpacing: -.8,
             color: SeaColors.ink,
@@ -89,7 +83,7 @@ class PageBody extends StatelessWidget {
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 720),
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
         children: children,
       ),
     ),
@@ -109,7 +103,7 @@ class Notice extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(bottom: 12),
-    padding: const EdgeInsets.all(14),
+    padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
       color: warning ? const Color(0xFFFFF1D5) : SeaColors.mist,
       borderRadius: BorderRadius.circular(12),
@@ -119,7 +113,7 @@ class Notice extends StatelessWidget {
       children: [
         Icon(
           icon,
-          size: 21,
+          size: 18,
           color: warning ? const Color(0xFF80500A) : SeaColors.ink,
         ),
         const SizedBox(width: 10),
@@ -199,7 +193,7 @@ class SectionTitle extends StatelessWidget {
   final String? subtitle;
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 20, bottom: 12),
+    padding: const EdgeInsets.only(top: 16, bottom: 10),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -321,11 +315,32 @@ class BeachTile extends StatelessWidget {
     margin: const EdgeInsets.only(bottom: 8),
     color: Colors.white,
     child: ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-      leading: const CircleAvatar(
-        backgroundColor: SeaColors.mist,
-        foregroundColor: SeaColors.ocean,
-        child: Icon(Icons.beach_access_outlined),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: const SizedBox(
+          width: 66,
+          height: 66,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              CoastalPhoto(alignment: Alignment.centerLeft),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: ColoredBox(
+                  color: Color(0x99003257),
+                  child: Text(
+                    'Illustration',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       title: Text(
         beach.name,
@@ -337,7 +352,7 @@ class BeachTile extends StatelessWidget {
       subtitle: Text(
         beach.hasCantil
             ? 'Cantil · Sudden-drop warning'
-            : 'View beach information',
+            : 'Lianga, Surigao del Sur',
       ),
       trailing: Icon(
         beach.hasCantil ? Icons.warning_amber_rounded : Icons.chevron_right,

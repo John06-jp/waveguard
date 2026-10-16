@@ -34,7 +34,14 @@ class DemoMarineRepository implements MarineRepository {
       ),
     );
     return MarineForecast(
-      current: hourly.first,
+      current: MarinePoint(
+        start,
+        hourly.first.height,
+        hourly.first.direction,
+        hourly.first.period,
+        windWaveHeight: .24,
+        seaTemperature: 27,
+      ),
       hourly: hourly,
       daily: daily,
       fetchedAt: now,
@@ -54,7 +61,8 @@ class OpenMeteoMarineRepository implements MarineRepository {
     final uri = Uri.https('marine-api.open-meteo.com', '/v1/marine', {
       'latitude': '8.6336',
       'longitude': '126.0947',
-      'current': 'wave_height,wave_direction,wave_period',
+      'current':
+          'wave_height,wave_direction,wave_period,wind_wave_height,sea_surface_temperature',
       'hourly': 'wave_height,wave_direction,wave_period',
       'daily': 'wave_height_max,wave_direction_dominant,wave_period_max',
       'forecast_days': '7',
@@ -104,6 +112,8 @@ MarineForecast parseOpenMeteo(Map<String, dynamic> j) {
             value(current['wave_height']),
             value(current['wave_direction']),
             value(current['wave_period']),
+            windWaveHeight: value(current['wind_wave_height']),
+            seaTemperature: value(current['sea_surface_temperature']),
           ),
     hourly: rows('hourly', ['wave_height', 'wave_direction', 'wave_period']),
     daily: rows('daily', [

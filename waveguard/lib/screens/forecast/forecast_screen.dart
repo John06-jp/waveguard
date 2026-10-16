@@ -6,6 +6,7 @@ import '../../providers/marine_provider.dart';
 import '../../services/app_preferences.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/shared.dart';
+import '../../widgets/marine_visuals.dart';
 
 class ForecastScreen extends StatefulWidget {
   const ForecastScreen({this.initialDaily = false, super.key});
@@ -65,11 +66,13 @@ class _ForecastScreenState extends State<ForecastScreen> {
       child: PageBody(
         children: [
           Text(
-            _daily ? 'Seven days at sea' : 'The next 48 hours',
-            style: Theme.of(context).textTheme.headlineMedium,
+            _daily
+                ? '7-Day Marine Forecast'
+                : 'Hourly Marine Forecast (Next 48 Hours)',
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
-          const Text('Lianga regional marine forecast'),
+          const LocationStrip(),
           const SizedBox(height: 16),
           SegmentedButton<bool>(
             segments: const [
@@ -82,7 +85,7 @@ class _ForecastScreenState extends State<ForecastScreen> {
               _selected = 0;
             }),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           const MarineNotices(),
           Wrap(
             spacing: 8,
@@ -104,10 +107,10 @@ class _ForecastScreenState extends State<ForecastScreen> {
               'No marine values are available in this time window. Retry to check for updates.',
             ),
           if (selected != null) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             Text(
               display(selected),
-              style: Theme.of(context).textTheme.headlineLarge,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             Text(stamp(selected.time)),
             const SizedBox(height: 12),
@@ -115,7 +118,7 @@ class _ForecastScreenState extends State<ForecastScreen> {
               label:
                   'Forecast chart. Use the slider below to inspect each ${_daily ? 'day' : 'hour'}.',
               child: SizedBox(
-                height: 180,
+                height: 170,
                 child: LayoutBuilder(
                   builder: (context, constraints) => GestureDetector(
                     onTapDown: (details) => setState(
@@ -165,7 +168,24 @@ class _ForecastScreenState extends State<ForecastScreen> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
-                columnSpacing: 20,
+                columnSpacing: 16,
+                showCheckboxColumn: false,
+                headingRowColor: WidgetStateProperty.all(
+                  const Color(0xFFEBF4FC),
+                ),
+                headingRowHeight: 44,
+                dataRowMinHeight: 40,
+                dataRowMaxHeight: 48,
+                horizontalMargin: 12,
+                headingTextStyle: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: SeaColors.ink,
+                ),
+                dataTextStyle: const TextStyle(
+                  fontSize: 11,
+                  color: SeaColors.ink,
+                ),
                 columns: [
                   const DataColumn(label: Text('Time (PHT)')),
                   DataColumn(label: Text('Height (${units.lengthUnit})')),
@@ -179,7 +199,7 @@ class _ForecastScreenState extends State<ForecastScreen> {
                         onSelectChanged: (_) =>
                             setState(() => _selected = points.indexOf(p)),
                         cells: [
-                          DataCell(Text(stamp(p.time))),
+                          DataCell(Text(compactTime(p.time, daily: _daily))),
                           DataCell(Text(units.height(p.height))),
                           DataCell(
                             Text(
@@ -273,18 +293,13 @@ class _CurrentWeatherScreenState extends State<CurrentWeatherScreen> {
     final current = data.forecast?.current;
     final units = context.watch<AppPreferences>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Current marine weather')),
+      appBar: AppBar(title: const Text('Current Marine Weather')),
       body: RefreshIndicator(
         onRefresh: data.load,
         child: PageBody(
           children: [
-            Text(
-              'Lianga, Surigao del Sur',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 6),
-            const Text('Regional forecast point · 8.6336° N, 126.0947° E'),
-            const SizedBox(height: 20),
+            LocationStrip(refresh: data.loading ? null : data.load),
+            const SizedBox(height: 10),
             const MarineNotices(),
             if (current == null && !data.loading)
               const EmptyState(
@@ -293,59 +308,158 @@ class _CurrentWeatherScreenState extends State<CurrentWeatherScreen> {
               ),
             if (current != null) ...[
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: SeaColors.ocean,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(13),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF0055AC), Color(0xFF007E90)],
+                  ),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Icon(Icons.waves, color: Colors.white, size: 42),
-                    const SizedBox(height: 14),
-                    Text(
-                      units.height(current.height),
-                      style: const TextStyle(
-                        fontSize: 38,
+                    const Text(
+                      'Current Marine Conditions',
+                      style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
                       ),
                     ),
-                    const Text(
-                      'Wave height',
-                      style: TextStyle(color: Colors.white),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.waves,
+                          size: 52,
+                          color: Color(0xFF50D2FF),
+                        ),
+                        const SizedBox(width: 18),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                units.height(current.height),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 31,
+                                ),
+                              ),
+                              const Text(
+                                'Wave Height',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 18),
+                    const Text(
+                      'Modelled marine conditions',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'This is not a swimming advisory.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                    const SizedBox(height: 12),
                     Text(
                       'Valid at ${stamp(current.time)}',
-                      style: const TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.white, fontSize: 11),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              ListTile(
-                leading: const Icon(Icons.explore_outlined),
-                title: const Text('Wave direction'),
-                trailing: Text(
-                  current.direction == null
-                      ? 'Unavailable'
-                      : '${current.direction!.round()}°',
-                ),
+              const SizedBox(height: 8),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final items = [
+                    MetricTile(
+                      Icons.explore_outlined,
+                      current.direction == null
+                          ? 'Unavailable'
+                          : '${current.direction!.round()}\u00b0',
+                      'Wave Direction',
+                    ),
+                    MetricTile(
+                      Icons.schedule,
+                      current.period == null
+                          ? 'Unavailable'
+                          : '${current.period!.toStringAsFixed(1)} s',
+                      'Wave Period',
+                    ),
+                    MetricTile(
+                      Icons.air,
+                      units.height(current.windWaveHeight),
+                      'Wind Wave Height',
+                    ),
+                  ];
+                  final wideText =
+                      MediaQuery.textScalerOf(context).scale(1) > 1.3;
+                  return Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: items
+                        .map(
+                          (tile) => SizedBox(
+                            width: wideText
+                                ? constraints.maxWidth
+                                : (constraints.maxWidth - 12) / 3,
+                            child: tile,
+                          ),
+                        )
+                        .toList(),
+                  );
+                },
               ),
-              ListTile(
-                leading: const Icon(Icons.timer_outlined),
-                title: const Text('Wave period'),
-                trailing: Text(
-                  current.period == null
-                      ? 'Unavailable'
-                      : '${current.period!.toStringAsFixed(1)} s',
+              const SectionTitle('Additional information'),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: SeaColors.mist),
+                ),
+                child: Column(
+                  children: [
+                    _reading(
+                      'Sea temperature',
+                      current.seaTemperature == null
+                          ? 'Unavailable'
+                          : '${current.seaTemperature!.toStringAsFixed(1)} \u00b0C',
+                    ),
+                    const Divider(),
+                    _reading(
+                      'Data source',
+                      data.repository.isDemo
+                          ? 'Demo sample'
+                          : 'Open-Meteo Marine',
+                    ),
+                    const Divider(),
+                    _reading('Forecast area', 'Regional Lianga'),
+                  ],
                 ),
               ),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             const Notice(
-              'Marine conditions are model estimates, not an official swimming advisory. Check the separate regional advisory and local warnings.',
+              'Check the regional advisory and local warnings before coastal activities.',
             ),
             const Attribution(),
           ],
@@ -353,6 +467,31 @@ class _CurrentWeatherScreenState extends State<CurrentWeatherScreen> {
       ),
     );
   }
+
+  Widget _reading(String label, String value) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Expanded(child: Text(label)),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              color: SeaColors.ink,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+String compactTime(DateTime time, {bool daily = false}) {
+  final d = time.toUtc().add(const Duration(hours: 8));
+  return '${d.month}/${d.day}${daily ? '' : ' ${d.hour.toString().padLeft(2, '0')}:00'}';
 }
 
 class _ForecastPainter extends CustomPainter {

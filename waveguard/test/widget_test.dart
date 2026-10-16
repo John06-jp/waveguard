@@ -41,6 +41,7 @@ Future<void> tapVisible(WidgetTester tester, Finder finder) async {
     );
   }
   await tester.ensureVisible(finder);
+  await tester.pump();
   await tester.tap(finder);
   await tester.pump();
 }
@@ -68,7 +69,7 @@ void main() {
     await openApp(tester);
     await tapVisible(tester, find.text('Continue as guest'));
     await tester.pumpAndSettle();
-    expect(find.text('Sample regional advisory'), findsOneWidget);
+    expect(find.text('Stay Informed,\nStay Safe'), findsOneWidget);
     await tapVisible(tester, find.text('Sample beach'));
     await tester.pumpAndSettle();
     expect(find.text('Beach information'), findsOneWidget);
@@ -80,6 +81,8 @@ void main() {
     await tapVisible(tester, find.text('Advisory history'));
     await tester.pumpAndSettle();
     expect(find.text('The coast over time'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('SOS'));
     await tester.pumpAndSettle();
     expect(find.text('Emergency assistance'), findsOneWidget);
@@ -107,13 +110,13 @@ void main() {
         child: const MaterialApp(home: SosScreen(phone: '+639000000000')),
       ),
     );
-    await tester.tap(find.text('Call MDRRMO'));
+    await tester.tap(find.byTooltip('Call MDRRMO'));
     await tester.pumpAndSettle();
     expect(external.opened, isEmpty);
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(external.opened, isEmpty);
-    await tester.tap(find.text('Call MDRRMO'));
+    await tester.tap(find.byTooltip('Call MDRRMO'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Open dialer'));
     await tester.pumpAndSettle();
@@ -121,6 +124,7 @@ void main() {
     await tester.scrollUntilVisible(
       find.textContaining('Could not open the phone dialer'),
       200,
+      scrollable: find.byType(Scrollable).first,
     );
     expect(
       find.textContaining('Could not open the phone dialer'),

@@ -14,13 +14,6 @@ class BeachesScreen extends StatelessWidget {
       onRefresh: data.load,
       child: PageBody(
         children: [
-          Text(
-            'Beaches in Lianga',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 10),
-          const Text('Explore local information and cantil warnings.'),
-          const SizedBox(height: 18),
           const DataNotices(),
           if (beaches.isEmpty && !data.loading)
             const EmptyState(

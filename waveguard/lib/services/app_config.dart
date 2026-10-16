@@ -5,6 +5,9 @@ abstract final class AppConfig {
   static const senderId = String.fromEnvironment('FIREBASE_SENDER_ID');
   static const projectId = String.fromEnvironment('FIREBASE_PROJECT_ID');
   static const emergencyPhone = String.fromEnvironment('MDRRMO_PHONE');
+  static const coastGuardPhone = String.fromEnvironment('COAST_GUARD_PHONE');
+  static const policePhone = String.fromEnvironment('PNP_PHONE');
+  static const healthUnitPhone = String.fromEnvironment('HEALTH_UNIT_PHONE');
   static const tileUrl = String.fromEnvironment(
     'MAP_TILE_URL',
     defaultValue: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',

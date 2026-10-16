@@ -7,7 +7,7 @@ import 'services/bootstrap.dart';
 import 'services/external_actions.dart';
 import 'theme/app_theme.dart';
 import 'widgets/animated_waves.dart';
-import 'widgets/shared.dart';
+import 'screens/splash/splash_screen.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/main_shell.dart';
 import 'services/app_preferences.dart';
@@ -100,18 +100,7 @@ class _EntryGateState extends State<_EntryGate> {
   Widget build(BuildContext context) {
     final session = context.watch<SessionProvider>();
     if (!_splashDone || !_sessionReady) {
-      return const Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Brand(),
-              SizedBox(height: 24),
-              CircularProgressIndicator(semanticsLabel: 'Opening WaveGuard'),
-            ],
-          ),
-        ),
-      );
+      return const SplashScreen();
     }
     if (!context.watch<AppPreferences>().onboardingComplete &&
         !session.entered) {
