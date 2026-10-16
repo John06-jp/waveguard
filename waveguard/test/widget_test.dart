@@ -26,8 +26,8 @@ Future<void> openApp(WidgetTester tester) async {
   );
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 50));
-  await tester.ensureVisible(find.text('Get Started'));
-  await tester.tap(find.text('Get Started'));
+  await tester.ensureVisible(find.text('Skip').first);
+  await tester.tap(find.text('Skip').first);
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 50));
 }

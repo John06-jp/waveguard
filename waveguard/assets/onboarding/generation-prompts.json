@@ -1,0 +1,49 @@
+{
+  "generator": "Built-in image_gen.imagegen for backgrounds, illustrations, wave_splash, and clouds_overlay. Flutter canvas/widget export for other PNGs.",
+  "prompts": [
+    {
+      "name": "onboarding_bg1",
+      "dir": "backgrounds",
+      "prompt": "One standalone photorealistic ocean background for a mobile onboarding screen. Portrait 9:16 composition, intended 1080x1920. Deep tropical blue open ocean with lively small waves and fine white foam in lower half, distant low mountainous island horizon near middle, vibrant blue sky and soft white clouds above, natural daylight. Match a polished marine weather app's clean ocean-blue palette. This is generic illustrative scenery, not a claimed actual Lianga location. No text, logos, frames, phones, icons, UI, montage or collage."
+    },
+    {
+      "name": "onboarding_bg2",
+      "dir": "backgrounds",
+      "prompt": "One standalone photorealistic ocean background, portrait 9:16 composition intended 1080x1920. A beautiful curling turquoise-blue wave breaking across the lower two thirds, sparkling natural white spray, deep blue water, sunbeams through bright blue sky in the upper third. Clean realistic tropical seascape, marine weather mobile app art, coherent blue palette. No text, labels, logos, phones, UI, borders, collage, or people."
+    },
+    {
+      "name": "onboarding_bg3",
+      "dir": "backgrounds",
+      "prompt": "One standalone photorealistic tropical coastline background for mobile onboarding. Portrait 9:16 composition intended 1080x1920. Elevated viewpoint along a curving pale-sand beach, vivid turquoise shallows, deep blue sea to left, lush green palm-covered headland and distant coastline to right, clear blue sky with white clouds. Beautiful natural daylight, realistic scenery. Generic illustration, no claim of a specific real beach. No text, logos, phones, maps, UI, people, borders, montage or collage."
+    },
+    {
+      "name": "onboarding_bg4",
+      "dir": "backgrounds",
+      "prompt": "One standalone photorealistic marine onboarding background. Portrait 9:16 composition intended 1080x1920. Calm rich blue tropical ocean foreground with a little foamy shore wash, distant green mountains and islands on horizon, broad brilliant blue sky with cumulus clouds. Clear inviting daylight and polished marine-blue palette, realistic detail. No text, logos, icons, cards, people, boats, phones, UI, borders or collage."
+    },
+    {
+      "name": "illustration_wave",
+      "prompt": "One standalone premium 3D editorial ocean illustration, portrait composition. A graceful curling deep-blue and cyan ocean wave with crisp white foam spray, isolated on a genuinely transparent background. Beautiful rounded dimensional shapes, clean polished marine-app onboarding artwork, coherent cobalt, azure and turquoise palette, realistic water detail but simplified readable silhouette. Entire wave and all spray inside frame with generous clear margins. No ocean photograph backdrop, checkerboard pattern, words, letters, numerals, logos, phones, UI, labels, cards, frame, montage or collage."
+    },
+    {
+      "name": "illustration_weather",
+      "prompt": "One standalone polished 3D marine-weather onboarding illustration, square composition. A single slightly tilted modern blue smartphone surrounded by turquoise waves and white foam. Its screen shows ONLY abstract wave glyph and a simple line graph, no words, numerals or status claims. Glossy clean dimensional illustration with rounded forms, cobalt and cyan palette, isolated on a genuinely transparent background with generous clear margins around the entire subject. No checkerboard, background scenery, labels, extra phones, text, logos, border, montage or collage."
+    },
+    {
+      "name": "illustration_map",
+      "prompt": "One standalone polished 3D coastal-map onboarding illustration, square composition. A folded blue-and-green map with a large coral-orange location pin, a small lush tropical island with palms, turquoise coastline and a subtle winding blue route. Readable friendly dimensional shapes, cobalt and cyan marine-app palette with coral accent. Isolated on genuinely transparent background, generous clear margins, entire subject inside frame. No text, numbers, real place names, geographic claims, checkerboard, logo, UI, border, montage or collage."
+    },
+    {
+      "name": "illustration_safety",
+      "prompt": "One standalone polished 3D marine-safety onboarding illustration, square composition. An orange life jacket with navy straps, red-and-white lifebuoy, and a blue shield with white check mark arranged together as ONE balanced compact safety illustration. Friendly clean dimensional shapes, realistic soft highlights, premium marine-app artwork. Isolated on genuinely transparent background with generous clear margins, entire subject visible. No checkerboard, words, numbers, text, logo, card, scene background, frame, montage or collage."
+    },
+    {
+      "name": "wave_splash",
+      "prompt": "One standalone photorealistic horizontal splash of clear turquoise ocean water with rich blue wave body, delicate white foam, droplets and spray. Wide 16:9 composition. Isolated on a genuinely transparent background, clean edges and natural translucency with empty space above, entire splash inside frame. Useful as a marine mobile app foreground overlay. No checkerboard, sky, horizon, beach, text, logos, frame or collage."
+    },
+    {
+      "name": "clouds_overlay",
+      "prompt": "One standalone photorealistic horizontal cluster of soft white cumulus clouds with subtle cool blue shadows and fine wispy edges, wide 16:9 composition. Isolated on a genuinely transparent background, natural cloud translucency, entire cluster inside frame with generous clear margins. Useful as an ocean mobile-app sky overlay. No blue sky background, checkerboard, sun, ocean, landscape, text, logos, frame or collage."
+    }
+  ]
+}

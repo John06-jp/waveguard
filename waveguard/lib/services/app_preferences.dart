@@ -5,7 +5,7 @@ class AppPreferences extends ChangeNotifier {
   AppPreferences([this.storage]) {
     imperial = storage?.getBool('units.imperial') ?? false;
     alerts = storage?.getBool('alerts.preference') ?? false;
-    onboardingComplete = storage?.getBool('onboarding.complete') ?? false;
+    onboardingComplete = storage?.getBool('onboarding.v2.complete') ?? false;
   }
   final SharedPreferences? storage;
   bool imperial = false, alerts = false, onboardingComplete = false;
@@ -43,6 +43,6 @@ class AppPreferences extends ChangeNotifier {
   Future<void> finishOnboarding() async {
     onboardingComplete = true;
     notifyListeners();
-    await _save('onboarding.complete', true);
+    await _save('onboarding.v2.complete', true);
   }
 }

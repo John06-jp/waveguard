@@ -1,0 +1,170 @@
+[
+  {
+    "path": "app/app_icon.png",
+    "width": 1024,
+    "height": 1024,
+    "pngColorType": 6,
+    "bytes": 254040
+  },
+  {
+    "path": "app/app_icon_dark.png",
+    "width": 1024,
+    "height": 1024,
+    "pngColorType": 6,
+    "bytes": 303984
+  },
+  {
+    "path": "backgrounds/onboarding_bg1.png",
+    "width": 941,
+    "height": 1672,
+    "pngColorType": 2,
+    "bytes": 2677914
+  },
+  {
+    "path": "backgrounds/onboarding_bg2.png",
+    "width": 941,
+    "height": 1672,
+    "pngColorType": 2,
+    "bytes": 2615394
+  },
+  {
+    "path": "backgrounds/onboarding_bg3.png",
+    "width": 941,
+    "height": 1672,
+    "pngColorType": 2,
+    "bytes": 2960637
+  },
+  {
+    "path": "backgrounds/onboarding_bg4.png",
+    "width": 941,
+    "height": 1672,
+    "pngColorType": 2,
+    "bytes": 2924949
+  },
+  {
+    "path": "effects/clouds_overlay.png",
+    "width": 1672,
+    "height": 941,
+    "pngColorType": 6,
+    "bytes": 939510
+  },
+  {
+    "path": "effects/wave_ribbon.png",
+    "width": 1920,
+    "height": 1080,
+    "pngColorType": 6,
+    "bytes": 64824
+  },
+  {
+    "path": "effects/wave_splash.png",
+    "width": 1672,
+    "height": 941,
+    "pngColorType": 6,
+    "bytes": 2011190
+  },
+  {
+    "path": "icons/icon_conditions.png",
+    "width": 512,
+    "height": 512,
+    "pngColorType": 6,
+    "bytes": 13036
+  },
+  {
+    "path": "icons/icon_map.png",
+    "width": 512,
+    "height": 512,
+    "pngColorType": 6,
+    "bytes": 13223
+  },
+  {
+    "path": "icons/icon_safety.png",
+    "width": 512,
+    "height": 512,
+    "pngColorType": 6,
+    "bytes": 9350
+  },
+  {
+    "path": "icons/icon_welcome.png",
+    "width": 512,
+    "height": 512,
+    "pngColorType": 6,
+    "bytes": 28047
+  },
+  {
+    "path": "icons/wave_logo.png",
+    "width": 512,
+    "height": 512,
+    "pngColorType": 6,
+    "bytes": 60815
+  },
+  {
+    "path": "illustrations/illustration_map.png",
+    "width": 1254,
+    "height": 1254,
+    "pngColorType": 6,
+    "bytes": 1272395
+  },
+  {
+    "path": "illustrations/illustration_safety.png",
+    "width": 1254,
+    "height": 1254,
+    "pngColorType": 6,
+    "bytes": 1701110
+  },
+  {
+    "path": "illustrations/illustration_wave.png",
+    "width": 1024,
+    "height": 1536,
+    "pngColorType": 6,
+    "bytes": 3007924
+  },
+  {
+    "path": "illustrations/illustration_weather.png",
+    "width": 1254,
+    "height": 1254,
+    "pngColorType": 6,
+    "bytes": 1504937
+  },
+  {
+    "path": "ui/btn_back.png",
+    "width": 600,
+    "height": 200,
+    "pngColorType": 6,
+    "bytes": 6525
+  },
+  {
+    "path": "ui/btn_get_started.png",
+    "width": 600,
+    "height": 200,
+    "pngColorType": 6,
+    "bytes": 33439
+  },
+  {
+    "path": "ui/btn_next.png",
+    "width": 600,
+    "height": 200,
+    "pngColorType": 6,
+    "bytes": 30944
+  },
+  {
+    "path": "ui/btn_skip.png",
+    "width": 300,
+    "height": 100,
+    "pngColorType": 6,
+    "bytes": 2404
+  },
+  {
+    "path": "ui/card_wave.png",
+    "width": 1080,
+    "height": 300,
+    "pngColorType": 6,
+    "bytes": 12629
+  },
+  {
+    "path": "ui/indicator_dots.png",
+    "width": 400,
+    "height": 80,
+    "pngColorType": 6,
+    "bytes": 4136
+  }
+]

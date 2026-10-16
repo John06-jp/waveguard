@@ -13,6 +13,14 @@ import 'support/fakes.dart';
 final previewKey = GlobalKey();
 Future<void> capture(WidgetTester tester, String name) async {
   if (!const bool.fromEnvironment('CAPTURE_UI')) return;
+  final images = find.byType(Image).evaluate().toList();
+  await tester.runAsync(() async {
+    await Future.wait(
+      images.map(
+        (element) => precacheImage((element.widget as Image).image, element),
+      ),
+    );
+  });
   await tester.pump();
   await tester.runAsync(() async {
     final boundary =
@@ -68,9 +76,25 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.text('Get Started'), findsOneWidget);
+      expect(find.text('Welcome to\nWaveGuard'), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
-      await capture(tester, 'get-started');
+      await capture(tester, 'get-started-1');
+      expect(
+        tester
+            .widget<OutlinedButton>(find.widgetWithText(OutlinedButton, 'Back'))
+            .onPressed,
+        isNull,
+      );
+      for (var page = 1; page < 4; page++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+        await capture(tester, 'get-started-${page + 1}');
+      }
+      await tester.tap(find.text('Back'));
+      await tester.pumpAndSettle();
+      expect(find.text('Explore\nCoastal Areas'), findsOneWidget);
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Get Started'));
       await tester.tap(find.text('Get Started'));
       await tester.pump();
