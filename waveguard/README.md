@@ -1,6 +1,8 @@
 # waveguard
 
-A new Flutter project.
+WaveGuard is a Flutter Android frontend for regional coastal advisories in Lianga, Surigao del Sur.
+
+See [the frontend setup guide](docs/frontend-setup.md) for demo access, Firebase configuration, the public data schema, SOS setup, and Android verification. The default build uses visibly labeled fictional demo data. Run `flutter run` and choose **Continue as guest** to preview it.
 
 ## Getting Started
 

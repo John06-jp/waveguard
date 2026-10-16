@@ -1,5 +1,12 @@
 # WaveGuard Android Frontend Plan
 
+## Implementation status
+
+- Implemented: Android Flutter app structure; splash and animated login; registration and reset forms; guest navigation; Advisory, beach detail, map, History, and SOS screens; shared components; Provider state; demo and Firestore repositories; persistent public-data cache; Firebase Auth adapter and trusted role claims.
+- Preview defaults: public guest browsing, 24/48/72-hour history choices, OpenStreetMap tiles, and confirmed dialer handoff when a verified emergency phone is supplied. Admin/MDRRMO management remains outside this app.
+- Setup still required: Firebase project configuration, reviewed/deployed backend access rules, verified public records, a verified MDRRMO contact, and agreement on the freshness threshold and map provider for distribution.
+- See `docs/frontend-setup.md` for configuration, schema, checks, and Android toolchain limitations. The implementation does not fabricate live authentication, safety statuses, or emergency delivery.
+
 ## Scope
 
 Build the public-facing WaveGuard Android app in Flutter. Replace the starter counter app in `lib/main.dart`; implement screens and shared code under `lib/`. `web/index.html` is not part of this Android work.

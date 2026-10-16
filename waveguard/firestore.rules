@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public frontend data only. Publish from a trusted backend.
+    match /public/current {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /beaches/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /incidents/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /statusHistory/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
