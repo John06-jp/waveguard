@@ -99,6 +99,7 @@ void main() {
       await tester.tap(find.text('Get Started'));
       await tester.pump();
       expect(find.widgetWithText(FilledButton, 'Login'), findsOneWidget);
+      await capture(tester, 'login');
       await tester.ensureVisible(find.text('Continue as guest'));
       await tester.tap(find.text('Continue as guest'));
       await tester.pumpAndSettle();
