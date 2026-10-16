@@ -10,6 +10,10 @@ import 'widgets/animated_waves.dart';
 import 'widgets/shared.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/main_shell.dart';
+import 'services/app_preferences.dart';
+import 'screens/onboarding/get_started_screen.dart';
+import 'providers/marine_provider.dart';
+import 'repositories/marine_repository.dart';
 
 class WaveGuardApp extends StatelessWidget {
   const WaveGuardApp({
@@ -33,6 +37,13 @@ class WaveGuardApp extends StatelessWidget {
         value: externalActions ?? PlatformExternalActions(),
       ),
       ChangeNotifierProvider(create: (_) => SessionProvider(dependencies.auth)),
+      ChangeNotifierProvider(
+        create: (_) => dependencies.preferences ?? AppPreferences(),
+      ),
+      ChangeNotifierProvider<MarineProvider>(
+        create: (_) =>
+            dependencies.marine ?? MarineProvider(DemoMarineRepository()),
+      ),
     ],
     child: MaterialApp(
       title: 'WaveGuard',
@@ -100,6 +111,12 @@ class _EntryGateState extends State<_EntryGate> {
             ],
           ),
         ),
+      );
+    }
+    if (!context.watch<AppPreferences>().onboardingComplete &&
+        !session.entered) {
+      return GetStartedScreen(
+        onContinue: () => context.read<AppPreferences>().finishOnboarding(),
       );
     }
     return session.entered

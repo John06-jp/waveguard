@@ -4,6 +4,11 @@ import '../../providers/public_data_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/shared.dart';
 import '../beach_detail/beach_detail_screen.dart';
+import '../forecast/forecast_screen.dart';
+import '../more/more_screen.dart';
+import '../map/map_screen.dart';
+import '../beaches/beaches_screen.dart';
+import '../../services/app_preferences.dart';
 
 class AdvisoryScreen extends StatelessWidget {
   const AdvisoryScreen({super.key});
@@ -42,13 +47,13 @@ class AdvisoryScreen extends StatelessWidget {
                   _Condition(
                     Icons.waves,
                     'Wave height',
-                    '${advisory.waveHeight.toStringAsFixed(1)} m',
+                    context.watch<AppPreferences>().height(advisory.waveHeight),
                     constraints.maxWidth,
                   ),
                   _Condition(
                     Icons.air,
                     'Wind speed',
-                    '${advisory.windSpeed.toStringAsFixed(0)} km/h',
+                    context.watch<AppPreferences>().wind(advisory.windSpeed),
                     constraints.maxWidth,
                   ),
                   _Condition(
@@ -66,6 +71,88 @@ class AdvisoryScreen extends StatelessWidget {
               'There is no current regional status to display. Check with local authorities.',
               icon: Icons.waves,
             ),
+          const SectionTitle('Quick access'),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final actions = <(IconData, String, Widget)>[
+                (Icons.waves, 'Current Weather', const CurrentWeatherScreen()),
+                (
+                  Icons.schedule,
+                  'Hourly Forecast',
+                  const Scaffold(body: ForecastScreen()),
+                ),
+                (
+                  Icons.calendar_month,
+                  '7-Day Forecast',
+                  const Scaffold(body: ForecastScreen(initialDaily: true)),
+                ),
+                (
+                  Icons.map_outlined,
+                  'Map View',
+                  const Scaffold(body: MapScreen()),
+                ),
+                (
+                  Icons.beach_access_outlined,
+                  'Beach Info',
+                  const Scaffold(body: BeachesScreen()),
+                ),
+                (
+                  Icons.health_and_safety_outlined,
+                  'Safety Tips',
+                  const SafetyTipsScreen(),
+                ),
+              ];
+              final columns = MediaQuery.textScalerOf(context).scale(1) > 1.3
+                  ? 2
+                  : 3;
+              return Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: actions
+                    .map(
+                      (action) => SizedBox(
+                        width:
+                            (constraints.maxWidth - (columns - 1) * 10) /
+                            columns,
+                        child: Material(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () => openMainPage(context, action.$3),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 18,
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    action.$1,
+                                    color: SeaColors.ocean,
+                                    size: 30,
+                                  ),
+                                  const SizedBox(height: 9),
+                                  Text(
+                                    action.$2,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: SeaColors.ink,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              );
+            },
+          ),
+          const SizedBox(height: 20),
           const SizedBox(height: 16),
           const Notice(
             'One regional advisory covers Lianga. Conditions can vary at individual beaches.',

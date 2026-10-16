@@ -8,10 +8,13 @@ import '../../services/app_config.dart';
 import '../../services/external_actions.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/shared.dart';
+import '../../providers/marine_provider.dart';
+import '../../services/app_preferences.dart';
 import '../beach_detail/beach_detail_screen.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  const MapScreen({this.incidentsOnly = false, super.key});
+  final bool incidentsOnly;
   @override
   State<MapScreen> createState() => _MapScreenState();
 }
@@ -19,6 +22,17 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   bool _tileError = false, _mapReady = false;
   int _attempt = 0;
+  String? _incidentType;
+  @override
+  void initState() {
+    super.initState();
+    if (!widget.incidentsOnly) {
+      Future.microtask(() {
+        if (mounted) context.read<MarineProvider>().load();
+      });
+    }
+  }
+
   void _failed() {
     if (_tileError || !mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -58,17 +72,49 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     final data = context.watch<PublicDataProvider>();
     final beaches = data.snapshot?.beaches ?? <Beach>[];
-    final incidents = data.snapshot?.incidents ?? <Incident>[];
+    final allIncidents = data.snapshot?.incidents ?? <Incident>[];
+    final incidents = allIncidents
+        .where((i) => _incidentType == null || i.type == _incidentType)
+        .toList();
+    final marine = context.watch<MarineProvider>();
     return PageBody(
       children: [
         Text(
-          'Find your stretch of coast',
+          widget.incidentsOnly
+              ? 'Historical Incident Map'
+              : 'Marine weather map',
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         const SizedBox(height: 10),
         const Text('Lianga, Surigao del Sur · No location tracking'),
         const SizedBox(height: 16),
         const DataNotices(),
+        if (widget.incidentsOnly) ...[
+          const Notice(
+            'Past incidents are records, not a forecast of present danger.',
+          ),
+          Wrap(
+            spacing: 8,
+            children: [
+              ChoiceChip(
+                label: const Text('All types'),
+                selected: _incidentType == null,
+                onSelected: (_) => setState(() => _incidentType = null),
+              ),
+              ...allIncidents
+                  .map((i) => i.type)
+                  .toSet()
+                  .map(
+                    (type) => ChoiceChip(
+                      label: Text(type),
+                      selected: _incidentType == type,
+                      onSelected: (_) => setState(() => _incidentType = type),
+                    ),
+                  ),
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(
@@ -96,18 +142,74 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                     MarkerLayer(
                       markers: [
-                        ...beaches.map(
-                          (beach) => Marker(
-                            point: LatLng(beach.latitude, beach.longitude),
+                        if (!widget.incidentsOnly)
+                          Marker(
+                            point: LatLng(
+                              marine.forecast?.latitude ?? 8.6336,
+                              marine.forecast?.longitude ?? 126.0947,
+                            ),
                             width: 52,
                             height: 52,
                             child: IconButton.filled(
-                              tooltip: beach.name,
-                              onPressed: () => openBeach(context, beach.id),
-                              icon: const Icon(Icons.beach_access, size: 25),
+                              tooltip: 'Regional marine forecast point',
+                              style: IconButton.styleFrom(
+                                backgroundColor: SeaColors.ink,
+                              ),
+                              icon: const Icon(Icons.waves),
+                              onPressed: () => showModalBottomSheet<void>(
+                                context: context,
+                                builder: (_) => SafeArea(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(24),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Lianga marine forecast',
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge,
+                                        ),
+                                        if (marine.forecast?.isDemo ?? true)
+                                          const Text('Demo forecast values'),
+                                        Text(
+                                          context.read<AppPreferences>().height(
+                                            marine.forecast?.current?.height,
+                                          ),
+                                        ),
+                                        const Text(
+                                          'Regional sea-grid point; not a beach-specific assessment.',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                        ...beaches
+                            .where(
+                              (b) =>
+                                  !widget.incidentsOnly ||
+                                  incidents.any((i) => i.beachId == b.id),
+                            )
+                            .map(
+                              (beach) => Marker(
+                                point: LatLng(beach.latitude, beach.longitude),
+                                width: 52,
+                                height: 52,
+                                child: IconButton.filled(
+                                  tooltip: beach.name,
+                                  onPressed: () => openBeach(context, beach.id),
+                                  icon: const Icon(
+                                    Icons.beach_access,
+                                    size: 25,
+                                  ),
+                                ),
+                              ),
+                            ),
                         ...incidents
                             .where(
                               (i) => i.latitude != null && i.longitude != null,
@@ -181,19 +283,27 @@ class _MapScreenState extends State<MapScreen> {
             label: const Text('Retry map'),
           ),
         ],
-        const SectionTitle(
-          'Beaches',
-          subtitle: 'Blue markers: beaches. Red markers: incident records.',
-        ),
-        if (beaches.isEmpty && !data.loading)
+        if (!widget.incidentsOnly)
+          const SectionTitle(
+            'Beaches',
+            subtitle: 'Blue markers: beaches. Red markers: incident records.',
+          ),
+        if (!widget.incidentsOnly && beaches.isEmpty && !data.loading)
           const EmptyState(
             'No beach records',
             'Beach markers will appear when verified records are available.',
           ),
-        ...beaches.map(
-          (beach) =>
-              BeachTile(beach, onTap: () => openBeach(context, beach.id)),
-        ),
+        ...beaches
+            .where((b) => !widget.incidentsOnly)
+            .map(
+              (beach) =>
+                  BeachTile(beach, onTap: () => openBeach(context, beach.id)),
+            ),
+        if (widget.incidentsOnly && incidents.isEmpty && !data.loading)
+          const EmptyState(
+            'No incident records',
+            'No public incidents match this filter.',
+          ),
         if (incidents.isNotEmpty) ...[
           const SectionTitle('Incident records'),
           ...incidents.map(

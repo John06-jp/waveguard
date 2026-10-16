@@ -9,16 +9,23 @@ import '../repositories/firestore_public_repository.dart';
 import 'app_config.dart';
 import 'auth_service.dart';
 import 'snapshot_cache.dart';
+import 'app_preferences.dart';
+import '../providers/marine_provider.dart';
+import '../repositories/marine_repository.dart';
 
 class AppDependencies {
   const AppDependencies({
     required this.data,
     required this.auth,
     this.startupMessage,
+    this.preferences,
+    this.marine,
   });
   final PublicDataProvider data;
   final AuthService auth;
   final String? startupMessage;
+  final AppPreferences? preferences;
+  final MarineProvider? marine;
 }
 
 Future<AppDependencies> bootstrap() async {
@@ -52,13 +59,17 @@ Future<AppDependencies> bootstrap() async {
     }
   }
   SnapshotCache cache;
+  AppPreferences preferences;
   try {
+    final storage = await SharedPreferences.getInstance();
+    preferences = AppPreferences(storage);
     cache = PreferencesSnapshotCache(
-      await SharedPreferences.getInstance(),
+      storage,
       repository.isDemo ? 'demo' : 'live.${AppConfig.projectId}',
     );
   } catch (_) {
     cache = _UnavailableCache();
+    preferences = AppPreferences();
   }
   return AppDependencies(
     data: PublicDataProvider(
@@ -71,6 +82,13 @@ Future<AppDependencies> bootstrap() async {
       ),
     ),
     auth: auth,
+    preferences: preferences,
+    marine: MarineProvider(
+      const bool.fromEnvironment('USE_LIVE_MARINE')
+          ? OpenMeteoMarineRepository()
+          : DemoMarineRepository(),
+      storage: preferences.storage,
+    ),
     startupMessage: message,
   );
 }

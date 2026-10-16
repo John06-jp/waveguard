@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 abstract final class SeaColors {
   static const ink = Color(0xFF123D50);
-  static const ocean = Color(0xFF12677A);
+  static const ocean = Color(0xFF006DA6);
   static const foam = Color(0xFFF2F7F8);
   static const mist = Color(0xFFDCECF0);
   static const muted = Color(0xFF526C78);
@@ -10,6 +10,7 @@ abstract final class SeaColors {
 }
 
 ThemeData buildTheme() => ThemeData(
+  fontFamily: 'Roboto',
   useMaterial3: true,
   colorScheme: ColorScheme.fromSeed(
     seedColor: SeaColors.ocean,
@@ -63,13 +64,20 @@ ThemeData buildTheme() => ThemeData(
     style: FilledButton.styleFrom(
       minimumSize: const Size(48, 54),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+      textStyle: const TextStyle(
+        fontFamily: 'Roboto',
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+      ),
     ),
   ),
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(minimumSize: const Size(48, 52)),
   ),
-  navigationBarTheme: const NavigationBarThemeData(
+  navigationBarTheme: NavigationBarThemeData(
+    labelTextStyle: WidgetStateProperty.all(
+      const TextStyle(color: Colors.white, fontSize: 12),
+    ),
     backgroundColor: Colors.white,
     indicatorColor: SeaColors.mist,
   ),

@@ -74,41 +74,73 @@ class _SosScreenState extends State<SosScreen> {
       children: [
         Text(
           'Emergency assistance',
+          textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         const SizedBox(height: 10),
         const Text(
           'If you are in danger, move to a safer place if possible and contact local responders.',
+          textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16, height: 1.5),
         ),
         const SizedBox(height: 28),
         Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 260),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: SeaColors.danger,
-                  padding: const EdgeInsets.symmetric(vertical: 36),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32),
+            constraints: const BoxConstraints(maxWidth: 300),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: SeaColors.danger.withValues(alpha: .05),
+                  border: Border.all(
+                    color: SeaColors.danger.withValues(alpha: .10),
                   ),
                 ),
-                onPressed: _busy ? null : _confirm,
-                child: Column(
-                  children: [
-                    const Icon(Icons.sos, size: 64),
-                    const SizedBox(height: 8),
-                    Text(
-                      _busy
-                          ? 'Opening…'
-                          : _configured
-                          ? 'Call MDRRMO'
-                          : 'SOS options',
-                      style: const TextStyle(fontSize: 20),
+                child: Padding(
+                  padding: const EdgeInsets.all(22),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: SeaColors.danger.withValues(alpha: .08),
                     ),
-                  ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: SeaColors.danger,
+                          foregroundColor: Colors.white,
+                          elevation: 14,
+                          shadowColor: SeaColors.danger.withValues(alpha: .45),
+                          padding: const EdgeInsets.all(20),
+                          shape: const CircleBorder(),
+                        ),
+                        onPressed: _busy ? null : _confirm,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.sos, size: 56),
+                            const SizedBox(height: 8),
+                            Flexible(
+                              child: Text(
+                                _busy
+                                    ? 'Opening?'
+                                    : _configured
+                                    ? 'Call MDRRMO'
+                                    : 'SOS options',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

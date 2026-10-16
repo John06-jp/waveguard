@@ -56,6 +56,10 @@ Future<void> open(WidgetTester tester, ControlledAuth auth) async {
   );
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 100));
+  await tester.ensureVisible(find.text('Get Started'));
+  await tester.tap(find.text('Get Started'));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 50));
 }
 
 Future<void> press(WidgetTester tester, Finder finder) async {
@@ -113,8 +117,11 @@ void main() {
       await open(tester, auth);
       await press(tester, find.text('Forgot password?'));
       await tester.pump(const Duration(milliseconds: 350));
-    await tester.pump();
-    await tester.enterText(find.byType(TextFormField).last, 'user@example.com');
+      await tester.pump();
+      await tester.enterText(
+        find.byType(TextFormField).last,
+        'user@example.com',
+      );
       await press(tester, find.text('Send reset link'));
       await tester.pump();
       expect(auth.resetEmail, 'user@example.com');

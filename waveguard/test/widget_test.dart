@@ -26,6 +26,10 @@ Future<void> openApp(WidgetTester tester) async {
   );
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 50));
+  await tester.ensureVisible(find.text('Get Started'));
+  await tester.tap(find.text('Get Started'));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 50));
 }
 
 Future<void> tapVisible(WidgetTester tester, Finder finder) async {
@@ -71,10 +75,12 @@ void main() {
     expect(find.textContaining('Sudden underwater drop'), findsOneWidget);
     await tester.pageBack();
     await tester.pumpAndSettle();
-    await tester.tap(find.text('History'));
+    await tester.tap(find.text('More'));
+    await tester.pumpAndSettle();
+    await tapVisible(tester, find.text('Advisory history'));
     await tester.pumpAndSettle();
     expect(find.text('The coast over time'), findsOneWidget);
-    await tester.tap(find.text('SOS'));
+    await tester.tap(find.byTooltip('SOS'));
     await tester.pumpAndSettle();
     expect(find.text('Emergency assistance'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
