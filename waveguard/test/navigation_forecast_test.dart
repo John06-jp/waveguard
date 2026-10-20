@@ -173,6 +173,21 @@ void main() {
       );
       await tester.pumpAndSettle();
       await capture(tester, 'beaches');
+      final search = find.byWidgetPredicate(
+        (widget) =>
+            widget is TextField &&
+            widget.decoration?.hintText == 'Search beaches...',
+      );
+      await tester.enterText(search, 'no matching beach');
+      await tester.pumpAndSettle();
+      expect(find.text('No matching beaches'), findsOneWidget);
+      await tester.tap(find.byTooltip('Clear search'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('No cantil flag'));
+      await tester.pumpAndSettle();
+      expect(find.text('No matching beaches'), findsOneWidget);
+      await tester.tap(find.text('All'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Sample beach'));
       await tester.pumpAndSettle();
       expect(find.text('Beach information'), findsOneWidget);

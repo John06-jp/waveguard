@@ -27,7 +27,7 @@ class _MainShellState extends State<MainShell> {
     AdvisoryScreen(onAccount: _account, onSelectTab: _selectTab),
     const ForecastScreen(),
     const MapScreen(),
-    const BeachesScreen(),
+    BeachesScreen(onMap: () => _selectTab(2)),
     const MoreScreen(),
   ];
   Future<void> _account() async {
@@ -104,6 +104,7 @@ class _MainShellState extends State<MainShell> {
                 _index == 0 ||
                 _index == 1 ||
                 _index == 2 ||
+                _index == 3 ||
                 _index == 4)
             ? null
             : AppBar(
